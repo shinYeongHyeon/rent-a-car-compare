@@ -26,6 +26,10 @@ func main() {
 	}))
 	r.Use(gin.Recovery())
 
+	r.LoadHTMLGlob("template/*")
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(200, "index.html", gin.H{})
+	})
 	r.GET("/ping", health.Health)
 	r.GET("/costCompare", costCompare.CostCompare)
 

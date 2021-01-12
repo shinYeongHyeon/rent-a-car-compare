@@ -39,7 +39,7 @@ func CostCompare(c *gin.Context) {
 	costMaps := map[string]string{}
 	resultString := ""
 
-	contextVar, cancelFunc = context.WithTimeout(contextVar, 15*time.Second)
+	contextVar, cancelFunc = context.WithTimeout(contextVar, 60*time.Second)
 	defer cancelFunc()
 
 	err := chromedp.Run(contextVar,
