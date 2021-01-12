@@ -1,0 +1,5 @@
+package jejuPass
+
+func JejuPass() {
+
+}
