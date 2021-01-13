@@ -1,77 +1,48 @@
 package costCompare
 
 import (
-	"context"
-	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/chromedp"
+	"encoding/csv"
 	"github.com/gin-gonic/gin"
-	"log"
-	"strings"
-	"time"
+	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare/jejuPass"
+	"os"
 )
-
-type JejuPassRequest struct {
-	vhctySeCode string
-	resveBeginDe string
-	resveBeginTime string
-	resveEndDe string
-	resveEndTime string
-	insrncApplcCode string
-	monthYn string
-	yearLmtYn string
-	driverLicenseOneYearUnder string
-}
 
 // CostCompare
 func CostCompare(c *gin.Context) {
 	start := c.Query("start")
+	startTime := c.Query("sTime")
 	end := c.Query("end")
+	endTime := c.Query("eTime")
 
-	contextVar, cancelFunc := chromedp.NewContext(
-		context.Background(),
-		chromedp.WithLogf(log.Printf),
-	)
+	results := jejuPass.JejuPass(start, startTime, end, endTime)
 
-	defer cancelFunc()
+	fileName := start + startTime + "~" + end + endTime + ".csv"
 
-	var strVar string
-	costMaps := map[string]string{}
-	resultString := ""
+	isSuccess := extractCsv(fileName, results)
 
-	contextVar, cancelFunc = context.WithTimeout(contextVar, 60*time.Second)
-	defer cancelFunc()
+	if isSuccess {
+		c.FileAttachment(fileName, fileName)
+		defer os.Remove(fileName)
+	} else {
+		c.String(500, "Fail")
+	}
+}
 
-	err := chromedp.Run(contextVar,
-		chromedp.Navigate(`https://www.jejupassrent.com/home/search/list.do`),
-		chromedp.Click(`#YMD button`),
-		chromedp.Click(`.popover-content #date table tbody td[data-num="` + start + `"]`),
-		chromedp.Click(`.popover-content #date table tbody td[data-num="` + end + `"]`),
-		chromedp.Click(`.popover-content button.next.applyCalendarPanel`),
-		// TODO: 시간
-		chromedp.Click(`#container .popover-content .btn-wrap button.next`),
-		chromedp.Click(`#container > div.content-wrap > div.sidebar > form#leftForm > div.search-car-input > div.btn-wrap > #searchBtn`),
-		chromedp.WaitVisible(`#content #drawAreaView`),
-		chromedp.InnerHTML(`#content #drawAreaView`, &strVar, chromedp.NodeVisible, chromedp.ByQuery),
-	)
-
+func extractCsv(fileName string, maps map[string]string) bool {
+	file, err := os.Create(fileName)
 	if err != nil {
-		fmt.Println("Err : ", err)
+		return false
 	}
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(strVar))
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
 
-	if err != nil {
-		fmt.Println("Document Err : ", err)
+	headers := []string{"Jejupass", ""}
+	err = writer.Write(headers)
+
+	for key, value := range maps {
+		err = writer.Write([]string{key, value})
 	}
 
-	doc.Find("li.panel").Each(func (i int, s *goquery.Selection) {
-		model := s.Find("div.title > h3").Text()
-		cost := s.Find("div.right span.text-price").Text()
-
-		resultString += model + " : " + cost + "\n"
-		costMaps[model] = cost
-	})
-
-	c.String(200, resultString)
+	return true
 }
