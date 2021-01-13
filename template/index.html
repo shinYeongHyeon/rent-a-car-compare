@@ -2,28 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>YeongHyeon's Crawler</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>크롤러</h1>
+    <div class="container">
+        <h1>크롤러</h1>
 
-    <h2>Version</h2>
-    <ul>
-        <li>0.0.1 21.01.13: 제주패스 날짜검색</li>
-    </ul>
+        <br />
 
-    <hr>
+        <h2>Version</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>릴리즈버전</th>
+                    <th>릴리즈날짜</th>
+                    <th>내용</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0.0.1</td>
+                    <td>21. 01. 13</td>
+                    <td>제주패스 가격비교</td>
+                </tr>
+                <tr>
+                    <td>0.0.2</td>
+                    <td>21. 01. 14</td>
+                    <td>
+                        제주패스 가격비교 시간변수 추가 <br />
+                        csv 다운로드 기능 추가
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-    <h2>사용하기</h2>
-    <ul>
-        <li><h3>/costCompare?start={대여시작날짜}&end={대여종료날짜}</h3></li>
-        <div>
-            <p> 2021년 2월 9일 부터 2021년 2월 10일의 차량 가격을 긁어 오고 싶으면</p>
-            <p> {대여시작날짜} 에 <strong>20210209</strong></p>
-            <p> {대여종료날짜} 에 <strong>20210210</strong></p>
-            <p> 를 입력한다, e.g. prival.org:3030/costCompare?start=20210209&end=20210210</p>
+        <br />
+
+        <h2>사용하기</h2>
+        <div class="accordion" id="api_accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="cost_compare_accordion_header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#cost_compare_accordion" aria-expanded="true" aria-controls="cost_compare_accordion">
+                        <strong>/costCompare?start={대여시작날짜}&sTime={대여시간}&end={대여종료날짜}&eTime={대여종료시간}</strong>
+                    </button>
+                </h2>
+                <div id="cost_compare_accordion" class="accordion-collapse collapse show" aria-labelledby="cost_compare_accordion_header" data-bs-parent="#api_accordion">
+                    <div class="accordion-body">
+                        "제주패스" 의 차량별 최저가를 가져오는 API. csv 형태로 다운로드 되어집니다. <br />
+                        2021년 2월 9일 11시 00분부터 2021년 2월 10일 12시 30분의 차량 가격을 긁어 오고 싶으면 {대여시작날짜} 에 <strong>20210209</strong> {대여시간} 에 <strong>1100</strong> {대여종료날짜} 에 <strong>20210210</strong> {대여종료시간} 에 <strong>1230</strong> 를 입력한다. <br />
+                        <strong>분은 무조건 30분 단위입니다.</strong> <br />
+                        <br />
+                        e.g. prival.org:3030/costCompare?start=20210209&sTime=1100&end=20210210&eTime=1230
+                    </div>
+                </div>
+            </div>
         </div>
-    </ul>
-
+    </div>
 </body>
 </html>
