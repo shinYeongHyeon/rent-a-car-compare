@@ -5,13 +5,21 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
+	"github.com/gin-gonic/gin"
+	"github.com/shinYeongHyeon/rent-a-car-compare/lib"
+	"os"
 	"strings"
 	"time"
 	"log"
 )
 
 // JejuPass cars
-func JejuPass(startDate, startTime, endDate, endTime string) map[string]string {
+func JejuPass(c *gin.Context) {
+	startDate := c.Query("start")
+	startTime := c.Query("sTime")
+	endDate := c.Query("end")
+	endTime := c.Query("eTime")
+
 	contextVar, cancelFunc := chromedp.NewContext(
 		context.Background(),
 		chromedp.WithLogf(log.Printf),
@@ -58,5 +66,14 @@ func JejuPass(startDate, startTime, endDate, endTime string) map[string]string {
 		jejuPassResult[model] = cost
 	})
 
-	return jejuPassResult
+	jejuPassFileName := startDate + startTime + "~" + endDate + endTime + "_jejuPass.csv"
+	isSuccess := lib.ExtractCsv("jejuPass", jejuPassFileName, jejuPassResult)
+
+	if isSuccess {
+		c.FileAttachment(jejuPassFileName, jejuPassFileName)
+
+		defer os.Remove(jejuPassFileName)
+	} else {
+		c.String(500, "Fail")
+	}
 }

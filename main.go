@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare"
+	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare/jejuPass"
+	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare/zzimCar"
 	"github.com/shinYeongHyeon/rent-a-car-compare/health"
 	"time"
 )
@@ -31,7 +32,8 @@ func main() {
 		c.HTML(200, "index.html", gin.H{})
 	})
 	r.GET("/ping", health.Health)
-	r.GET("/costCompare", costCompare.CostCompare)
+	r.GET("/jejuPass", jejuPass.JejuPass)
+	r.GET("/zzimCar", zzimCar.ZzimCar)
 
 	r.Run(":3030")
 }

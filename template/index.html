@@ -36,6 +36,13 @@
                         csv 다운로드 기능 추가
                     </td>
                 </tr>
+                <tr>
+                    <td>0.0.3</td>
+                    <td>21. 01. 15</td>
+                    <td>
+                        찜카 추가
+                    </td>
+                </tr>
             </tbody>
         </table>
 
@@ -46,16 +53,22 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="cost_compare_accordion_header">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#cost_compare_accordion" aria-expanded="true" aria-controls="cost_compare_accordion">
-                        <strong>/costCompare?start={대여시작날짜}&sTime={대여시간}&end={대여종료날짜}&eTime={대여종료시간}</strong>
+                        <strong>/{회사명}?start={대여시작날짜}&sTime={대여시간}&end={대여종료날짜}&eTime={대여종료시간}</strong>
                     </button>
                 </h2>
                 <div id="cost_compare_accordion" class="accordion-collapse collapse show" aria-labelledby="cost_compare_accordion_header" data-bs-parent="#api_accordion">
                     <div class="accordion-body">
-                        "제주패스" 의 차량별 최저가를 가져오는 API. csv 형태로 다운로드 되어집니다. <br />
+                        {회사명} 의 차량별 최저가를 가져오는 API. csv 형태로 다운로드 되어집니다. <br />
                         2021년 2월 9일 11시 00분부터 2021년 2월 10일 12시 30분의 차량 가격을 긁어 오고 싶으면 {대여시작날짜} 에 <strong>20210209</strong> {대여시간} 에 <strong>1100</strong> {대여종료날짜} 에 <strong>20210210</strong> {대여종료시간} 에 <strong>1230</strong> 를 입력한다. <br />
-                        <strong>분은 무조건 30분 단위입니다.</strong> <br />
+                        <strong>분은 무조건 30분 단위입니다.</strong> <br /><br /><br />
+
+                        <ul class="list-group">
+                            <li class="list-group-item active" aria-current="true">회사명 목록</li>
+                            <li class="list-group-item">jejuPass</li>
+                            <li class="list-group-item">zzimCar</li>
+                        </ul>
                         <br />
-                        e.g. prival.org:3030/costCompare?start=20210209&sTime=1100&end=20210210&eTime=1230
+                        e.g. prival.org:3030/zzimCar?start=20210209&sTime=1100&end=20210210&eTime=1230
                     </div>
                 </div>
             </div>
