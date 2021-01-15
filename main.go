@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare/dolHaruPang"
 	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare/jejuPass"
 	"github.com/shinYeongHyeon/rent-a-car-compare/costCompare/zzimCar"
 	"github.com/shinYeongHyeon/rent-a-car-compare/health"
@@ -34,6 +35,7 @@ func main() {
 	r.GET("/ping", health.Health)
 	r.GET("/jejuPass", jejuPass.JejuPass)
 	r.GET("/zzimCar", zzimCar.ZzimCar)
+	r.GET("/dolHaruPang", dolHaruPang.DolHaruPang)
 
 	r.Run(":3030")
 }
