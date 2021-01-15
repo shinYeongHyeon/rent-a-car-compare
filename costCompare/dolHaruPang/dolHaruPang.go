@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"log"
 )
 
 // DolHaruPang
@@ -52,8 +53,6 @@ func DolHaruPang(c *gin.Context) {
 	startWeek := getWeekOfMonth(startDay, getSaturdayDateOfFirstWeekOfMonth(zzimCarDaysMap[startMonthTime.Weekday()]))
 	startHourSpanChild := getSpanChildNumber(startTime)
 
-	fmt.Println(startHourSpanChild)
-
 	endYear, _ := strconv.Atoi(endDate[:4])
 	endMonth, _ := strconv.Atoi(endDate[4:6])
 	endDay, _ := strconv.Atoi(endDate[6:8])
@@ -65,13 +64,10 @@ func DolHaruPang(c *gin.Context) {
 	monthDiff := startMonth - zzimCarMonthsMap[time.Now().Month()]
 	startAndEndMonthDiff := endMonth - startMonth
 
-	opts := []chromedp.ExecAllocatorOption{
-		chromedp.WindowSize(1920, 1080),
-	}
-
-	contextVar, cancelFunc := chromedp.NewExecAllocator(context.Background(), opts...)
-
-	contextVar, cancelFunc = chromedp.NewContext(contextVar)
+	contextVar, cancelFunc := chromedp.NewContext(
+		context.Background(),
+		chromedp.WithLogf(log.Printf),
+	)
 
 	defer cancelFunc()
 
@@ -83,6 +79,8 @@ func DolHaruPang(c *gin.Context) {
 
 	err := chromedp.Run(contextVar,
 		chromedp.Navigate(`https://www.dolharupang.com/list/car`),
+		chromedp.RemoveAttribute(`div.mobile-menu.visible-xs`, "class"),
+		chromedp.Click(`input[name="startDate"]`),
 		chromedp.Click(`input[name="startDate"]`),
 	)
 
@@ -90,7 +88,6 @@ func DolHaruPang(c *gin.Context) {
 
 	if monthDiff != 0 {
 		for i := 0; monthDiff - i > 0; i++ {
-			fmt.Println("i: ", i)
 			errFor := chromedp.Run(contextVar,
 				chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-days table.table-condensed th.next`,chromedp.ByQuery),
 			)
