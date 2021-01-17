@@ -6,13 +6,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	"github.com/gin-gonic/gin"
+	"github.com/shinYeongHyeon/go-times"
 	"github.com/shinYeongHyeon/rent-a-car-compare/lib"
-	"math"
 	"os"
 	"strconv"
+	"log"
 	"strings"
 	"time"
-	"log"
 )
 
 // DolHaruPang
@@ -22,46 +22,21 @@ func DolHaruPang(c *gin.Context) {
 	endDate := c.Query("end")
 	endTime := c.Query("eTime")
 
-	zzimCarDaysMap := map[time.Weekday]int{}
-	zzimCarDaysMap[time.Sunday] = 0
-	zzimCarDaysMap[time.Monday] = 1
-	zzimCarDaysMap[time.Tuesday] = 2
-	zzimCarDaysMap[time.Wednesday] = 3
-	zzimCarDaysMap[time.Thursday] = 4
-	zzimCarDaysMap[time.Friday] = 5
-	zzimCarDaysMap[time.Saturday] = 6
-
-	zzimCarMonthsMap := map[time.Month]int{}
-	zzimCarMonthsMap[time.January] = 1
-	zzimCarMonthsMap[time.February] = 2
-	zzimCarMonthsMap[time.March] = 3
-	zzimCarMonthsMap[time.April] = 4
-	zzimCarMonthsMap[time.May] = 5
-	zzimCarMonthsMap[time.June] = 6
-	zzimCarMonthsMap[time.July] = 7
-	zzimCarMonthsMap[time.August] = 8
-	zzimCarMonthsMap[time.September] = 9
-	zzimCarMonthsMap[time.October] = 10
-	zzimCarMonthsMap[time.November] = 11
-	zzimCarMonthsMap[time.December] = 12
-
 	startYear, _ := strconv.Atoi(startDate[:4])
 	startMonth, _ := strconv.Atoi(startDate[4:6])
 	startDay, _ := strconv.Atoi(startDate[6:8])
-	startMonthTime := time.Date(startYear, time.Month(startMonth), 1, 0, 0, 0, 0, time.UTC)
 	start := time.Date(startYear, time.Month(startMonth), startDay, 0, 0, 0, 0, time.UTC)
-	startWeek := getWeekOfMonth(startDay, getSaturdayDateOfFirstWeekOfMonth(zzimCarDaysMap[startMonthTime.Weekday()]))
+	startWeek := times.GetNthWeekOfMonth(start)
 	startHourSpanChild := getSpanChildNumber(startTime)
 
 	endYear, _ := strconv.Atoi(endDate[:4])
 	endMonth, _ := strconv.Atoi(endDate[4:6])
 	endDay, _ := strconv.Atoi(endDate[6:8])
-	endMonthTime := time.Date(endYear, time.Month(endMonth), 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(endYear, time.Month(endMonth), endDay, 0, 0, 0, 0, time.UTC)
-	endWeek := getWeekOfMonth(endDay, getSaturdayDateOfFirstWeekOfMonth(zzimCarDaysMap[endMonthTime.Weekday()]))
+	endWeek := times.GetNthWeekOfMonth(end)
 	endHourSpanChild := getSpanChildNumber(endTime)
 
-	monthDiff := startMonth - zzimCarMonthsMap[time.Now().Month()]
+	monthDiff := startMonth - times.MonthMap[time.Now().Month()]
 	startAndEndMonthDiff := endMonth - startMonth
 
 	contextVar, cancelFunc := chromedp.NewContext(
@@ -99,7 +74,7 @@ func DolHaruPang(c *gin.Context) {
 	}
 
 	err3 := chromedp.Run(contextVar,
-		chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-days table.table-condensed tbody tr:nth-child(` + strconv.Itoa(startWeek) + `) td:nth-child(` + strconv.Itoa(zzimCarDaysMap[start.Weekday()] + 1) + `)`),
+		chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-days table.table-condensed tbody tr:nth-child(` + strconv.Itoa(startWeek) + `) td:nth-child(` + strconv.Itoa(times.DaysMap[start.Weekday()] + 1) + `)`),
 		chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-hours table.table-condensed tbody tr td span:nth-child(` + strconv.Itoa(startHourSpanChild) + `)`),
 		chromedp.Click(`input[name="endDate"]`),
 	)
@@ -120,9 +95,11 @@ func DolHaruPang(c *gin.Context) {
 	}
 
 	err4 := chromedp.Run(contextVar,
-		chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-days table.table-condensed tbody tr:nth-child(` + strconv.Itoa(endWeek) + `) td:nth-child(` + strconv.Itoa(zzimCarDaysMap[end.Weekday()] + 1) + `)`),
+		chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-days table.table-condensed tbody tr:nth-child(` + strconv.Itoa(endWeek) + `) td:nth-child(` + strconv.Itoa(times.DaysMap[end.Weekday()] + 1) + `)`),
 		chromedp.Click(`body div.datetimepicker[style*="block"] div.datetimepicker-hours table.table-condensed tbody tr td span:nth-child(` + strconv.Itoa(endHourSpanChild) + `)`),
+		chromedp.Sleep(150 * time.Millisecond),
 		chromedp.Click(`.input-insur li:nth-child(2) button`),
+		chromedp.Sleep(150 * time.Millisecond),
 		chromedp.Click("#searchSchedule div.block-btn-search button.btn"),
 		chromedp.Sleep(8 * time.Second),
 	)
@@ -172,18 +149,6 @@ func errCheck(err error) {
 	if err != nil {
 		fmt.Println("err : ", err)
 	}
-}
-
-func getSaturdayDateOfFirstWeekOfMonth(startDay int) int {
-	return 7 - startDay
-}
-
-func getWeekOfMonth(date, saturdayDateOfFirstWeekOfMonth int) int {
-	if saturdayDateOfFirstWeekOfMonth >= date {
-		return 1
-	}
-
-	return 1 + int(math.Ceil(float64(date - saturdayDateOfFirstWeekOfMonth) / 7))
 }
 
 func getSpanChildNumber(time string) int {
